@@ -1,5 +1,7 @@
 type Query {
-  todos: [Int!]!
+  calculatePrice(operation: Operation!, margin: Float!, exchangeRate: Float!): Int!
 }
 
+
+scalar Operation
 

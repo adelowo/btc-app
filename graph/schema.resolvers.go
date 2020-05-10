@@ -7,27 +7,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/adelowo/btc-app/graph/generated"
+	"github.com/adelowo/queryapp"
+	generated1 "github.com/adelowo/queryapp/graph/generated"
 )
 
-func (r *queryResolver) Todos(ctx context.Context) ([]int, error) {
+func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Query returns generated1.QueryResolver implementation.
+func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) CreateTodo(ctx context.Context) error {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-
-type mutationResolver struct{ *Resolver }
