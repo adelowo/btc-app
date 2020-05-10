@@ -1,4 +1,4 @@
-name: Build and run all tests
+name: Build, run all tests and deploy Docker image
 
 on:
   push:
@@ -30,3 +30,21 @@ jobs:
 
     - name: Run all tests
       run: go test -v ./...
+
+    - name: Login to Github registry
+      if:  github.ref == 'refs/heads/master'
+      uses: actions-hub/docker/login@master
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        DOCKER_REGISTRY_URL: docker.pkg.github.com
+
+    - name: Build latest image
+      if: success() &&  github.ref == 'refs/heads/master'
+      run: docker build -t docker.pkg.github.com/${{ github.repository }}/server:latest .
+
+    - name: Push to Github Packages :latest
+      if: success() && github.ref == 'refs/heads/master'
+      uses: actions-hub/docker@master
+      with:
+        args: push docker.pkg.github.com/${{ github.repository }}/server:latest
