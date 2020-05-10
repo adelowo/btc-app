@@ -1,0 +1,28 @@
+name: Deploy Docker image
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+ github_package_management:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Login to Github registry
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+
+      - name: Build latest image
+        if: success()
+        run: docker build -t docker.pkg.github.com/${{ github.repository }}/queryapp:latest .
+
+      - name: Push to Github Packages :latest
+        if: success()
+        uses: actions-hub/docker@master
+        with:
+          args: push docker.pkg.github.com/${{ github.repository }}:latest
