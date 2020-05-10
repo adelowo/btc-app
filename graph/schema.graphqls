@@ -1,5 +1,5 @@
 type Query {
-  calculatePrice(operation: Operation!, margin: Float!): Int!
+  calculatePrice(operation: Operation!, margin: Float!, exchangeRate: Float!): Int!
 }
 
 

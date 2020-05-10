@@ -43,12 +43,12 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Query struct {
-		CalculatePrice func(childComplexity int, operation queryapp.Operation, margin float64) int
+		CalculatePrice func(childComplexity int, operation queryapp.Operation, margin float64, exchangeRate float64) int
 	}
 }
 
 type QueryResolver interface {
-	CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64) (int, error)
+	CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error)
 }
 
 type executableSchema struct {
@@ -76,7 +76,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CalculatePrice(childComplexity, args["operation"].(queryapp.Operation), args["margin"].(float64)), true
+		return e.complexity.Query.CalculatePrice(childComplexity, args["operation"].(queryapp.Operation), args["margin"].(float64), args["exchangeRate"].(float64)), true
 
 	}
 	return 0, false
@@ -129,7 +129,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	&ast.Source{Name: "graph/schema.graphqls", Input: `type Query {
-  calculatePrice(operation: Operation!, margin: Float!): Int!
+  calculatePrice(operation: Operation!, margin: Float!, exchangeRate: Float!): Int!
 }
 
 
@@ -176,6 +176,14 @@ func (ec *executionContext) field_Query_calculatePrice_args(ctx context.Context,
 		}
 	}
 	args["margin"] = arg1
+	var arg2 float64
+	if tmp, ok := rawArgs["exchangeRate"]; ok {
+		arg2, err = ec.unmarshalNFloat2float64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["exchangeRate"] = arg2
 	return args, nil
 }
 
@@ -239,7 +247,7 @@ func (ec *executionContext) _Query_calculatePrice(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CalculatePrice(rctx, args["operation"].(queryapp.Operation), args["margin"].(float64))
+		return ec.resolvers.Query().CalculatePrice(rctx, args["operation"].(queryapp.Operation), args["margin"].(float64), args["exchangeRate"].(float64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

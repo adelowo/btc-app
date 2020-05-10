@@ -11,7 +11,7 @@ import (
 	generated1 "github.com/adelowo/queryapp/graph/generated"
 )
 
-func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64) (int, error) {
+func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
