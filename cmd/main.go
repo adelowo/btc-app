@@ -7,8 +7,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/adelowo/btc-app/graph"
-	"github.com/adelowo/btc-app/graph/generated"
+	"github.com/adelowo/queryapp/graph"
+	"github.com/adelowo/queryapp/graph/generated"
 )
 
 const defaultPort = "8080"

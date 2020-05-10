@@ -12,6 +12,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/adelowo/queryapp"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -42,12 +43,12 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Query struct {
-		Todos func(childComplexity int) int
+		CalculatePrice func(childComplexity int, operation *queryapp.Operation) int
 	}
 }
 
 type QueryResolver interface {
-	Todos(ctx context.Context) ([]int, error)
+	CalculatePrice(ctx context.Context, operation *queryapp.Operation) (int, error)
 }
 
 type executableSchema struct {
@@ -65,12 +66,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Query.todos":
-		if e.complexity.Query.Todos == nil {
+	case "Query.calculatePrice":
+		if e.complexity.Query.CalculatePrice == nil {
 			break
 		}
 
-		return e.complexity.Query.Todos(childComplexity), true
+		args, err := ec.field_Query_calculatePrice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CalculatePrice(childComplexity, args["operation"].(*queryapp.Operation)), true
 
 	}
 	return 0, false
@@ -123,8 +129,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	&ast.Source{Name: "graph/schema.graphqls", Input: `type Query {
-  todos: [Int!]!
+  calculatePrice(operation: Operation): Int!
 }
+
+
+scalar Operation
 
 
 `, BuiltIn: false},
@@ -146,6 +155,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_calculatePrice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *queryapp.Operation
+	if tmp, ok := rawArgs["operation"]; ok {
+		arg0, err = ec.unmarshalOOperation2ᚖgithubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["operation"] = arg0
 	return args, nil
 }
 
@@ -185,7 +208,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_calculatePrice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -200,9 +223,16 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_calculatePrice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Todos(rctx)
+		return ec.resolvers.Query().CalculatePrice(rctx, args["operation"].(*queryapp.Operation))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -214,9 +244,9 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNInt2ᚕintᚄ(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1366,7 +1396,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "todos":
+		case "calculatePrice":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -1374,7 +1404,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_todos(ctx, field)
+				res = ec._Query_calculatePrice(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -1668,35 +1698,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]int, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
-	}
-
-	return ret
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -1958,6 +1959,30 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOOperation2githubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx context.Context, v interface{}) (queryapp.Operation, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	return queryapp.Operation(tmp), err
+}
+
+func (ec *executionContext) marshalOOperation2githubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx context.Context, sel ast.SelectionSet, v queryapp.Operation) graphql.Marshaler {
+	return graphql.MarshalString(string(v))
+}
+
+func (ec *executionContext) unmarshalOOperation2ᚖgithubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx context.Context, v interface{}) (*queryapp.Operation, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOOperation2githubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOOperation2ᚖgithubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx context.Context, sel ast.SelectionSet, v *queryapp.Operation) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOOperation2githubᚗcomᚋadelowoᚋqueryappᚐOperation(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
