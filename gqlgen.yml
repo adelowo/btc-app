@@ -9,8 +9,8 @@ exec:
 
 # Where should any generated models go?
 model:
-  filename: graph/model/models_gen.go
-  package: model
+  filename: graph/models_gen.go
+  package: graph
 
 resolver:
   layout: follow-schema

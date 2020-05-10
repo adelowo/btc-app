@@ -1,8 +1,7 @@
 type Query {
-  calculatePrice(operation: Operation): Int!
+  calculatePrice(operation: Operation!, margin: Float!): Int!
 }
 
 
 scalar Operation
-
 
