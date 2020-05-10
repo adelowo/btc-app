@@ -19,7 +19,7 @@ func main() {
 		port = defaultPort
 	}
 
-	graphiqlHandler, err := graphiql.NewGraphiqlHandler("/graphql")
+	graphiqlHandler, err := graphiql.NewGraphiqlHandler("/query")
 	if err != nil {
 		log.Fatalf("Could not set up graphiql...%v", err)
 	}
