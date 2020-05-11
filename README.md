@@ -13,18 +13,15 @@ Naira - while performing basic arithmetics.
   $ docker pull adelowo/queryapp
   $ docker run -p 9080:8080 adelowo/queryapp
   ```
-  ```
 
-
-  ```
-
-> Visit `http://localhost:9080/graphqiql`
+> Visit `http://localhost:9080/graphiql`
 
 
 - Building from source:
 
   ```
   $ go get github.com/adelowo/queryapp
+  $ cd queryapp
   $ go build -o app ./cmd
   $ ./app
   ```
