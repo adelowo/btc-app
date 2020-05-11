@@ -31,20 +31,19 @@ jobs:
     - name: Run all tests
       run: go test -v -tags integration ./...
 
-    - name: Login to Github registry
+    - name: Login into DockerHub
       if:  github.ref == 'refs/heads/master'
       uses: actions-hub/docker/login@master
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        DOCKER_REGISTRY_URL: docker.pkg.github.com
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build latest image
       if: success() &&  github.ref == 'refs/heads/master'
-      run: docker build -t docker.pkg.github.com/${{ github.repository }}/server:latest .
+      run: docker build -t ${GITHUB_REPOSITORY}:latest .
 
-    - name: Push to Github Packages :latest
+    - name: Push to DockerHub :latest
       if: success() && github.ref == 'refs/heads/master'
       uses: actions-hub/docker@master
       with:
-        args: push docker.pkg.github.com/${{ github.repository }}/server:latest
+        args:  push ${GITHUB_REPOSITORY}:latest
