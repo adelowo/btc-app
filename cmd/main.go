@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/adelowo/queryapp/coindesk"
 	"github.com/adelowo/queryapp/graph"
 	"github.com/adelowo/queryapp/graph/generated"
 	"github.com/friendsofgo/graphiql"
@@ -26,7 +27,14 @@ func main() {
 
 	http.Handle("/graphiql", graphiqlHandler)
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	btcClient, err := coindesk.New(nil)
+	if err != nil {
+		log.Fatalf("could not set up Coindesk client... %v", err)
+	}
+
+	srv := handler.NewDefaultServer(
+		generated.NewExecutableSchema(generated.Config{
+			Resolvers: graph.NewResolver(btcClient)}))
 
 	http.Handle("/query", srv)
 

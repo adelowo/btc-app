@@ -11,8 +11,8 @@ import (
 	"github.com/adelowo/queryapp/handlers"
 )
 
-func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error) {
-	return handlers.CalculatePrice(ctx, operation, margin, exchangeRate)
+func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (float64, error) {
+	return handlers.CalculatePrice(ctx, r.btcClient, operation, margin, exchangeRate)
 }
 
 // Query returns generated1.QueryResolver implementation.

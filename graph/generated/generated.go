@@ -48,7 +48,7 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
-	CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error)
+	CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (float64, error)
 }
 
 type executableSchema struct {
@@ -129,7 +129,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	&ast.Source{Name: "graph/schema.graphqls", Input: `type Query {
-  calculatePrice(operation: Operation!, margin: Float!, exchangeRate: Float!): Int!
+  calculatePrice(operation: Operation!, margin: Float!, exchangeRate: Float!): Float!
 }
 
 
@@ -259,9 +259,9 @@ func (ec *executionContext) _Query_calculatePrice(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1705,20 +1705,6 @@ func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
 	res := graphql.MarshalFloat(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
-	return graphql.UnmarshalInt(v)
-}
-
-func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
