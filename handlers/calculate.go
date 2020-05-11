@@ -32,9 +32,11 @@ func CalculatePrice(ctx context.Context, btcClient queryapp.Client,
 
 // feature flags like plusOp are kind of terrible but :)
 func calculate(btcPrice, margin float64, plusOp bool) float64 {
+	x := (margin / 100) * btcPrice
+
 	if plusOp {
-		return btcPrice + ((margin / 100) * btcPrice)
+		return btcPrice + x
 	}
 
-	return btcPrice - ((margin / 100) * btcPrice)
+	return btcPrice - x
 }
