@@ -40,3 +40,15 @@ func TestNew(t *testing.T) {
 	require.Equal(t, timeout, client.httpClient.Timeout)
 	require.Equal(t, httpClient, client.httpClient)
 }
+
+func TestClient_FetchPrice(t *testing.T) {
+	c, err := New(nil)
+	require.NoError(t, err)
+
+	value, err := c.FetchPrice()
+	require.NoError(t, err)
+
+	// Cannot verify actual amount as it'd make the test flakey,
+	// but make sure it is not zero
+	require.True(t, value > 0)
+}
