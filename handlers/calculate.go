@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/adelowo/queryapp"
 )
@@ -14,13 +13,28 @@ func CalculatePrice(ctx context.Context, btcClient queryapp.Client,
 		return 0, err
 	}
 
-	switch queryapp.ParseOperation(operation) {
-	case queryapp.BUY:
-		fmt.Println("Buying")
-	case queryapp.SELL:
-		fmt.Println("Selling")
+	price, err := btcClient.FetchPrice()
+	if err != nil {
+		return 0, err
 	}
 
-	price, err := btcClient.FetchPrice()
-	return price, err
+	var amount float64
+
+	switch queryapp.ParseOperation(operation) {
+	case queryapp.BUY:
+		amount = calculate(price, margin, true)
+	case queryapp.SELL:
+		amount = calculate(price, margin, false)
+	}
+
+	return amount * exchangeRate, nil
+}
+
+// feature flags like plusOp are kind of terrible but :)
+func calculate(btcPrice, margin float64, plusOp bool) float64 {
+	if plusOp {
+		return btcPrice + ((margin / 100) * btcPrice)
+	}
+
+	return btcPrice - ((margin / 100) * btcPrice)
 }

@@ -47,7 +47,7 @@ func (c *Client) FetchPrice() (float64, error) {
 func New(cl *http.Client) (queryapp.Client, error) {
 	if cl == nil {
 		cl = &http.Client{
-			Timeout: time.Second * 5, // Fail after 5 seconds
+			Timeout: time.Second * 10, // Fail after 10 seconds
 		}
 	}
 
