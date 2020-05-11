@@ -5,14 +5,14 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/adelowo/queryapp"
 	generated1 "github.com/adelowo/queryapp/graph/generated"
+	"github.com/adelowo/queryapp/handlers"
 )
 
-func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (int, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) CalculatePrice(ctx context.Context, operation queryapp.Operation, margin float64, exchangeRate float64) (float64, error) {
+	return handlers.CalculatePrice(ctx, r.btcClient, operation, margin, exchangeRate)
 }
 
 // Query returns generated1.QueryResolver implementation.

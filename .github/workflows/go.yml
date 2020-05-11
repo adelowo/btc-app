@@ -29,7 +29,7 @@ jobs:
       run: go build -o app ./cmd
 
     - name: Run all tests
-      run: go test -v ./...
+      run: go test -v -tags integration ./...
 
     - name: Login to Github registry
       if:  github.ref == 'refs/heads/master'

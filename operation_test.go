@@ -31,3 +31,27 @@ func TestIsValidOperation(t *testing.T) {
 		require.True(t, errors.Is(err, ErrUnknownOperation))
 	}
 }
+
+func TestParseOperation(t *testing.T) {
+	tt := []struct {
+		value    string
+		expected Operation
+	}{
+		{"sell", SELL},
+		{"Sell", SELL},
+		{"SEll", SELL},
+		{"SELl", SELL},
+		{"SELL", SELL},
+		{"buy", BUY},
+		{"Buy", BUY},
+		{"BUY", BUY},
+		{"Selling", UNKNOWNOperation},
+		{"Buying", UNKNOWNOperation},
+	}
+
+	for _, v := range tt {
+		op := ParseOperation(Operation(v.value))
+
+		require.Equal(t, v.expected, op)
+	}
+}

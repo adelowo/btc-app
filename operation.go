@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var ErrUnknownOperation = errors.New("invalid operation")
+var ErrUnknownOperation = errors.New("invalid BTC operation")
 
 type Operation string
 
@@ -14,15 +14,27 @@ func (o Operation) String() string {
 }
 
 const (
-	BUY  Operation = "Buy"
-	SELL Operation = "Sell"
+	UNKNOWNOperation           = ""
+	BUY              Operation = "buy"
+	SELL             Operation = "sell"
 )
 
 func IsValidOperation(o Operation) error {
-	switch o {
+	switch ParseOperation(o) {
 	case BUY, SELL:
 		return nil
 	default:
 		return ErrUnknownOperation
+	}
+}
+
+func ParseOperation(o Operation) Operation {
+	switch o.String() {
+	case "buy":
+		return BUY
+	case "sell":
+		return SELL
+	default:
+		return UNKNOWNOperation
 	}
 }
