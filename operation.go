@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var ErrUnknownOperation = errors.New("invalid operation")
+var ErrUnknownOperation = errors.New("invalid BTC operation")
 
 type Operation string
 
